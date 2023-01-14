@@ -1,8 +1,11 @@
 const express = require("express");
+const { request } = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const RandomToken = require("../utils/randomToken");
+const client_id = process.env.CLIENT_ID;
+const client_secret = process.env.CLIENT_SECRET;
 const User = require("../models/userModel");
 const {
   validateName,
@@ -11,6 +14,8 @@ const {
 } = require("../utils/validators");
 const { transporter } = require("../services/email");
 const resetPasswordOption = require("../utils/emailProvider");
+const { auth_token, token_url, data } = require("../utils/authorizeSpotify");
+const { default: axios } = require("axios");
 
 /**
  * @swagger
@@ -173,12 +178,25 @@ router.post("/signin", async (req, res) => {
     });
 
     res.cookie("token", bearerToken, { expire: new Date() + 360000 });
-
+    //also get token from spotify when user login
+    const response = await axios.post(token_url, data, {
+      headers: {
+        Authorization: `Basic ${auth_token}`,
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    });
+    //return access token
+    console.log(response)
+    let spotifyToken = response.data.access_token;
+    console.log(spotifyToken);
+    // console.log(await response.json());
     console.log("Logged in successfully");
 
-    return res
-      .status(200)
-      .json({ message: "Signed In Successfully!", bearerToken: bearerToken });
+    return res.status(200).json({
+      message: "Signed In Successfully!",
+      bearerToken: bearerToken,
+      spotifyToken,
+    });
   } catch (err) {
     console.log(err);
     return res.status(500).json({ err: err.message });
