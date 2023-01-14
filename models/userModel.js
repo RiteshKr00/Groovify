@@ -13,6 +13,8 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  resetToken: String,
+  expireToken: Date,
 });
 const User = mongoose.model("User", UserSchema);
 
