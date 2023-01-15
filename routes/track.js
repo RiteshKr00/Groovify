@@ -6,7 +6,7 @@ const router = express.Router();
 router.get("/allsong", async (req, res) => {
   try {
     const songs = await Track.find();
-    if (!songs.length) res.status(200).json({ message: "No Song found" });
+    if (!songs.length) res.status(404).json({ message: "No Song found" });
 
     res.status(200).json({ message: "success", Allsongs: songs });
   } catch (error) {
@@ -18,7 +18,7 @@ router.get("/track/:songId", async (req, res) => {
   try {
     const songId = req.params.songId;
     const song = await Track.findById(songId);
-    if (!song) res.status(200).json({ message: "No Song found with given Id" });
+    if (!song) res.status(404).json({ message: "No Song found with given Id" });
 
     res.status(200).json({ message: "success", song });
   } catch (error) {
