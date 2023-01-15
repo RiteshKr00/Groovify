@@ -1,9 +1,10 @@
 const express = require("express");
 const Track = require("../models/trackModel");
+const isAuthenticated = require("../middlewares/authJwt");
 const router = express.Router();
 
 //Get all Songs
-router.get("/allsong", async (req, res) => {
+router.get("/allsong", isAuthenticated, async (req, res) => {
   try {
     const songs = await Track.find();
     if (!songs.length) res.status(404).json({ message: "No Song found" });
@@ -14,7 +15,7 @@ router.get("/allsong", async (req, res) => {
   }
 });
 //playlist of given category
-router.get("/track/:songId", async (req, res) => {
+router.get("/track/:songId", isAuthenticated, async (req, res) => {
   try {
     const songId = req.params.songId;
     const song = await Track.findById(songId);
@@ -26,7 +27,7 @@ router.get("/track/:songId", async (req, res) => {
   }
 });
 //search songs using query parameters
-router.get("/search", async (req, res) => {
+router.get("/search", isAuthenticated, async (req, res) => {
   try {
     let queryArray = [];
     if (req.query.trackName) {

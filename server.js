@@ -14,10 +14,16 @@ app.use(express.json());
 
 //Database connection
 connectDB();
-app.use("/api/v1/", userRoutes);
+app.use("/api/v1/auth/", userRoutes);
 app.use("/api/v1/song/", songRoutes);
 app.use("/api/v1/song/spotify/", spotifyRoutes);
 app.use("/api/v1/playlists/", playlistRoutes);
+
+app.get("/ping", (req, res) => {
+  return res.status(200).json({
+    message: "Server is Live",
+  });
+});
 
 app.listen(process.env.PORT || 8080, () => {
   console.log("Server is runnng at port", process.env.PORT);

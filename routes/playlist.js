@@ -39,7 +39,7 @@ router.get("/", isAuthenticated, async (req, res) => {
   }
 });
 //Get  given playlist Id
-router.get("/:playlistId", async (req, res) => {
+router.get("/:playlistId", isAuthenticated, async (req, res) => {
   try {
     const playlist_id = req.params.playlistId;
     console.log(playlist_id);
@@ -53,7 +53,7 @@ router.get("/:playlistId", async (req, res) => {
   }
 });
 //Update Name and description of the given Id
-router.put("/:playlistId", async (req, res) => {
+router.put("/:playlistId", isAuthenticated, async (req, res) => {
   try {
     const playlist_id = req.params.playlistId;
     console.log(playlist_id);
@@ -62,6 +62,8 @@ router.put("/:playlistId", async (req, res) => {
       req.body,
       { new: true }
     );
+    if (!updatedplaylist)
+      return res.status(404).json({ message: "Playlist Not Found" });
 
     res.status(200).json({ message: "Playlist Updated", updatedplaylist });
   } catch (error) {
@@ -69,12 +71,16 @@ router.put("/:playlistId", async (req, res) => {
   }
 });
 //delete a playlist with given Id
-router.delete("/:playlistId", async (req, res) => {
+router.delete("/:playlistId", isAuthenticated, async (req, res) => {
   try {
     const playlist_id = req.params.playlistId;
     const deletedPlaylist = await Playlist.findOneAndDelete({
       _id: playlist_id,
     });
+    if (!deletedPlaylist)
+      return res
+        .status(404)
+        .json({ message: "Playlist to be deleted Not Found" });
     res
       .status(200)
       .json({ message: "Playlist Deleted", Deleted_playlist: deletedPlaylist });
@@ -83,10 +89,16 @@ router.delete("/:playlistId", async (req, res) => {
   }
 });
 //add songs to given playlist
-router.post("/:playlistId/songs", async (req, res) => {
+router.post("/:playlistId/songs", isAuthenticated, async (req, res) => {
   try {
     const playlist_id = req.params.playlistId;
     const { song_id } = req.body;
+    //check track exist or not
+    const isTrackExist = await Track.findById(song_id);
+    if (!isTrackExist)
+      return res
+        .status(404)
+        .json({ message: "Song of given Id Does not exist" });
     const updatedPlaylist = await Playlist.findByIdAndUpdate(
       playlist_id,
       {
@@ -96,16 +108,29 @@ router.post("/:playlistId/songs", async (req, res) => {
         new: true,
       }
     );
+
+    if (!updatedPlaylist)
+      return res
+        .status(404)
+        .json({ message: "Playlist Not Found to be Updated" });
+
     res.status(200).json({ message: "Playlist Updated", updatedPlaylist });
   } catch (error) {
     res.status(500).json({ message: `Server Error + ${error}` });
   }
 });
 //remove songs from given playlist
-router.delete("/:playlistId/songs", async (req, res) => {
+router.delete("/:playlistId/songs", isAuthenticated, async (req, res) => {
   try {
     const playlist_id = req.params.playlistId;
     const { song_id } = req.body;
+    //check track exist or not
+    const isTrackExist = await Track.findById(song_id);
+    if (!isTrackExist)
+      return res
+        .status(404)
+        .json({ message: "Song of given Id Does not exist" });
+
     const updatedPlaylist = await Playlist.findByIdAndUpdate(
       playlist_id,
       {
@@ -115,6 +140,12 @@ router.delete("/:playlistId/songs", async (req, res) => {
         new: true,
       }
     );
+
+    if (!updatedPlaylist)
+      return res
+        .status(404)
+        .json({ message: "Playlist Not Found to be Updated" });
+
     res
       .status(200)
       .json({ message: "Song Deleted From Playlist", updatedPlaylist });

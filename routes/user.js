@@ -174,7 +174,7 @@ router.post("/signin", async (req, res) => {
 
     const payload = { user: { id: existingUser._id } };
     const bearerToken = await jwt.sign(payload, process.env.secret, {
-      expiresIn: 360000,
+      expiresIn: "1h",
     });
 
     res.cookie("token", bearerToken, { expire: new Date() + 360000 });
@@ -186,7 +186,7 @@ router.post("/signin", async (req, res) => {
       },
     });
     //return access token
-    console.log(response)
+    console.log(response);
     let spotifyToken = response.data.access_token;
     console.log(spotifyToken);
     // console.log(await response.json());
@@ -225,10 +225,10 @@ router.get("/signout", async (_req, res) => {
     return res.status(500).json({ err: err.message });
   }
 });
+
 router.post("/forgotpassword", async (req, res) => {
   try {
     const token = RandomToken();
-    console.log(token);
     const user = await User.findOneAndUpdate(
       { email: req.body.email },
       { $set: { resetToken: token, expireToken: Date.now() + 3600000 } }, //1hr
@@ -239,16 +239,17 @@ router.post("/forgotpassword", async (req, res) => {
         .status(422)
         .json({ error: "User dont exists with that email" });
     }
-    console.log("first");
     console.log(resetPasswordOption(req.body.email, token));
     const option = resetPasswordOption(req.body.email, token);
     //send mail
+    let email_details;
     transporter.sendMail(option, (err, info) => {
       if (err) {
         return res.status(500).json({ err: err });
       }
       console.log(info);
     });
+    //Email are pending in Sendgrid because account is under review
     res.status(200).json({ message: "Password Reset Link Sent" });
   } catch (err) {
     res.status(500).json({ message: `Email Not Sent ${err} ` });

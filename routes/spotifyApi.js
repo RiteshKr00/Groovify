@@ -3,6 +3,9 @@ const router = express.Router();
 const { auth_token, token_url, data } = require("../utils/authorizeSpotify");
 const { default: axios } = require("axios");
 const Track = require("../models/trackModel");
+const isAuthenticated = require("../middlewares/authJwt");
+
+//These routes can be called by Admin to Update Database
 
 const getAuth = async () => {
   try {
@@ -22,7 +25,7 @@ const getAuth = async () => {
   }
 };
 //browse all categories
-router.get("/browsesongs", async (req, res) => {
+router.get("/browsesongs", isAuthenticated, async (req, res) => {
   try {
     const access_token = await getAuth();
     console.log(access_token);
@@ -45,7 +48,7 @@ router.get("/browsesongs", async (req, res) => {
   }
 });
 //playlist of given category
-router.get("/playlist/:categoryId", async (req, res) => {
+router.get("/playlist/:categoryId", isAuthenticated, async (req, res) => {
   try {
     const category_id = req.params.categoryId;
     const access_token = await getAuth();
@@ -77,11 +80,10 @@ router.get("/playlist/:categoryId", async (req, res) => {
   }
 });
 //Get tracks of given playlist Id and add it to database
-router.get("/tracks/:playlistId", async (req, res) => {
+router.get("/tracks/:playlistId", isAuthenticated, async (req, res) => {
   try {
     const playlist_id = req.params.playlistId;
     const access_token = await getAuth();
-    console.log(access_token);
     if (!access_token) {
       return res.status(400).json({ message: "Spotify auth failed" });
     }
@@ -139,7 +141,7 @@ router.get("/tracks/:playlistId", async (req, res) => {
   }
 });
 //get track details
-router.get("/tracks/music/:trackId", async (req, res) => {
+router.get("/tracks/music/:trackId", isAuthenticated, async (req, res) => {
   try {
     const track_id = req.params.trackId;
     const access_token = await getAuth();
@@ -173,7 +175,7 @@ router.get("/tracks/music/:trackId", async (req, res) => {
   }
 });
 //search songs
-router.get("/search", async (req, res) => {
+router.get("/search", isAuthenticated, async (req, res) => {
   try {
     const { query } = req.body;
     const { querytype } = req.body; //track or artist
