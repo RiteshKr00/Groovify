@@ -3,22 +3,28 @@ const mongoose = require("mongoose");
 const TrackSchema = new mongoose.Schema({
   trackId: {
     type: String,
+    unique: true,
   },
   trackName: {
     type: String,
     required: true,
+    unique: true,
   },
-  album: {
+  albumName: {
     type: String,
     required: true,
   },
   artistList: [
     {
-      type: string,
+      type: String,
     },
   ],
   duration: {
     type: Number,
+    required: true,
+  },
+  trackUrl: {
+    type: String,
     required: true,
   },
 });

@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const { connectDB } = require("./config/db");
 const userRoutes = require("./routes/user");
 const songRoutes = require("./routes/track");
+const spotifyRoutes = require("./routes/spotifyApi");
 
 require("dotenv").config();
 
@@ -14,6 +15,7 @@ app.use(express.json());
 connectDB();
 app.use("/api/v1/", userRoutes);
 app.use("/api/v1/song/", songRoutes);
+// app.use("/api/v1/song/spotify/", spotifyRoutes);
 
 app.listen(process.env.PORT || 8080, () => {
   console.log("Server is runnng at port", process.env.PORT);
