@@ -45,7 +45,9 @@ Bringing Music to Life with Groovify
 
 ## 🔴 Live demo
 
-The site is deployed throught Vercel, and you can access it [here](https://task-production-8ff6.up.railway.app/ping)
+The site is deployed using Railway, and you can access it [here](https://task-production-8ff6.up.railway.app/ping)
+
+Postman documentation [Link](https://documenter.getpostman.com/view/14553418/2s8ZDU4NvK)
 
 ## 🚀 Main Features:
 
